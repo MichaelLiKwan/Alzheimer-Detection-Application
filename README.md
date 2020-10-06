@@ -1,1 +1,1 @@
-# Alzheimer-Detection-Apllication
+# Alzheimer-Detection-Application
