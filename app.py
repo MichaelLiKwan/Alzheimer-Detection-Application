@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return render_template('design.html')
+    return render_template('home.html')
 
 @app.route('/home')
 def home():
@@ -13,11 +13,11 @@ def home():
 
 @app.route("/login")
 def login():
-    render_template("login.html")
+    return render_template("login.html")
 
 @app.route("/register")
 def register():
-    render_template("register.html")
+    return render_template("register.html")
 
 if __name__ == "__main__":
-    app.run('127.0.0.1', 5000, debug = True)
+    app.run('127.0.0.1', 4000, debug = True)
