@@ -7,10 +7,20 @@
     <title>Register</title>
 </head>
 <body>
+    <h1>Register</h1>
     <form action="/registerAuth" method="POST">
         <input type="text" name = "username" placeholder="username" required/> </br>
         <input type="password" name = "password" placeholder="password" required/></br>
-        <input type="submit" value = Login />
+        <input type="text" name = "firstName" placeholder="firstName" required/> </br>
+        <input type="text" name = "lastName" placeholder="lastName" required/> </br>
+        <input type="text" name = "phoneNumber" placeholder="phoneNumber" required/> </br>
+        <input type="text" name = "email" placeholder="email" required/> </br>
+        <h5>Please select your role:</h5>
+        <input type="radio" id="athlete" name="role" value="athlete">
+        <label for="athlete">Athlete</label><br>
+        <input type="radio" id="coach" name="role" value="coach">
+        <label for="coach">Coach</label><br><br>
+        <input type="submit" value = Register />
         {% if error %}
             <br><br>
             <p><strong>Error:</strong> {{error}}</p>

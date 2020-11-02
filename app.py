@@ -70,7 +70,33 @@ def loginAuth():
         error = 'Invalid login or username'
         return render_template('login.html', error=error)
 
+@app.route('/registerAuth', methods = ['GET','POST'])
+def registerAuth():
+    username = request.form['username']
+    password = request.form['password']
+    firstName = request.form['firstName']
+    lastName = request.form['lastName']
+    phoneNumber = request.form['phoneNumber']
+    email = request.form['email']
+    role = request.form['role']
 
+    #cursor used to send queries
+    cursor = conn.cursor()
+    query = 'SELECT * FROM users WHERE username = %s'
+    cursor.execute(query, (username))
+    data = cursor.fetchone()
+    cursor.close()
+    error = None
+    if (data):
+        # If the previous query returns data, then user exists
+        error = "This user already exists"
+        return render_template('register.html', error=error)
+    else:
+        ins = 'INSERT INTO users VALUES(%s, %s, %s, %s, %s, %s, %s)'
+        cursor.execute(ins, (username, password, firstName, lastName, phoneNumber, email, role))
+        conn.commit()
+        cursor.close()
+        return render_template('design.html')
 
 
 
