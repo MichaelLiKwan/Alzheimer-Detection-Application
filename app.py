@@ -92,11 +92,12 @@ def registerAuth():
         error = "This user already exists"
         return render_template('register.html', error=error)
     else:
+        cursor = conn.cursor()
         ins = 'INSERT INTO users VALUES(%s, %s, %s, %s, %s, %s, %s)'
         cursor.execute(ins, (username, password, firstName, lastName, phoneNumber, email, role))
         conn.commit()
         cursor.close()
-        return render_template('design.html')
+        return render_template('hello.html')
 
 
 
