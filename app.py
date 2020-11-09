@@ -123,8 +123,5 @@ def registerAuth():
         cursor.close()
         return redirect(urlfor("hello"))
 
-
-
-
 if __name__ == "__main__":
     app.run('127.0.0.1', 4000, debug = True)
