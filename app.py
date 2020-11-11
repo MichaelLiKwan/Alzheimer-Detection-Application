@@ -8,7 +8,7 @@ app = Flask(__name__)
 conn = pymysql.connect(host='localhost',
                        port=3306,
                        user='root',
-                       password='root',
+                       password='',
                        db='alzheimersPatients',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
@@ -121,7 +121,7 @@ def registerAuth():
         cursor.execute(ins, (username, password, firstName, lastName, phoneNumber, email, role))
         conn.commit()
         cursor.close()
-        return redirect(urlfor("hello"))
+        return redirect(url_for("hello"))
 
 if __name__ == "__main__":
     app.run('127.0.0.1', 4000, debug = True)
