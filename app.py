@@ -17,16 +17,9 @@ conn = pymysql.connect(host='localhost',
 def hello():
     return render_template('hello.html')
 
-@app.route('/home/<data>')
-def home(data):
-    data = data.replace('{' ,'')
-    data = data.replace('}' ,'')
-    data = data.replace('\'' ,'')
-    data = data.split(",")
-    username = data[0]
-    username = username.replace("username: ", "")
-    print(username)
-    return render_template('home.html', data=username)
+@app.route('/home/<role>/<user>')
+def home(role, user):
+    return render_template('home.html', role=role, user=user)
 
 @app.route("/login")
 def login():
@@ -42,7 +35,6 @@ def register():
 
 @app.route("/register/<error>")
 def register_err(error):
-    print(error)
     # return render_template("register.html")
     # error = "This user already exists"
     return render_template('register.html', error=error)
@@ -55,38 +47,35 @@ def loginAuth():
 
     #cursor used to send queries
     cursor = conn.cursor()
-    query = 'SELECT role FROM users WHERE username = %s and password = %s'
+    query = 'SELECT username, role FROM users WHERE username = %s and password = %s'
     cursor.execute(query, (username, password))
-    role = cursor.fetchone()
+    result = cursor.fetchone()
     cursor.close()
     error = None
-    if role == None:
+    if result == None:
         error = 'Invalid login or username'
         return redirect(url_for("login_err", error=error))
-    elif role['role'] == 'patient':
-        cursor = conn.cursor()
-        query = 'SELECT * FROM users WHERE username = %s and password = %s and role = %s'
-        cursor.execute(query, (username, password, 'patient'))
-        data = cursor.fetchone()
-        cursor.close()
-        return redirect(url_for("home", data=data))
-        #return render_template('patientHome.html', data=data)
-    elif role == 'caretaker':
-        cursor = conn.cursor()
-        query = 'SELECT * FROM users WHERE username = %s and password = %s and role = %s'
-        cursor.execute(query, (username, password, 'caretaker'))
-        data = cursor.fetchone()
-        cursor.close()
-        return redirect(url_for("home", data=data))
-        #return render_template('caretakerHome.html', data=data)
-    elif role == 'admin':
-        cursor = conn.cursor()
-        query = 'SELECT * FROM users WHERE username = %s and password = %s and role = %s'
-        cursor.execute(query, (username, password, 'admin'))
-        data = cursor.fetchone()
-        cursor.close()
-        # return render_template('home.html', data=data)
-        return redirect(url_for("home", data=data))
+    else:
+        role = result['role']
+        user = result['username']
+        
+        return redirect(url_for("home", role=role, user=user))
+    # elif role == 'caretaker':
+    #     cursor = conn.cursor()
+    #     query = 'SELECT * FROM users WHERE username = %s and password = %s and role = %s'
+    #     cursor.execute(query, (username, password, 'caretaker'))
+    #     data = cursor.fetchone()
+    #     cursor.close()
+    #     return redirect(url_for("home", data=data))
+    #     #return render_template('caretakerHome.html', data=data)
+    # elif role == 'admin':
+    #     cursor = conn.cursor()
+    #     query = 'SELECT * FROM users WHERE username = %s and password = %s and role = %s'
+    #     cursor.execute(query, (username, password, 'admin'))
+    #     data = cursor.fetchone()
+    #     cursor.close()
+    #     # return render_template('home.html', data=data)
+    #     return redirect(url_for("home", data=data))
         #return render_template('adminHome.html', data=data)
     # else:
     #     error = 'Invalid login or username'
@@ -121,7 +110,7 @@ def registerAuth():
         cursor.execute(ins, (username, password, firstName, lastName, phoneNumber, email, role))
         conn.commit()
         cursor.close()
-        return redirect(urlfor("hello"))
+        return redirect(url_for("hello"))
 
 if __name__ == "__main__":
     app.run('127.0.0.1', 4000, debug = True)
