@@ -9,7 +9,9 @@
 <body>
     <h1>Home</h1>
     <br>
-    <h2>Hello, {{data}}</h2>
+    <h2>Hello, {{session['firstName']}}</h2>
+    <a href="/medicalReportMenu">Medical Report</a>
+    <br><br>
     <img src="{{ url_for('static', filename='alzheimerFact.jpg') }}" style="width:100%;max-width:1000px" >
     </body>
 </html>
