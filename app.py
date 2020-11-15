@@ -13,8 +13,10 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf'}
 conn = pymysql.connect(host='localhost',
                        port=3306,
                        user='root',
+                       
                        password='root',
                        db='alzheimersDetectionProject',
+
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
@@ -213,6 +215,7 @@ def upload_report_handler():
                 except:
                     message = "An error occured when inserting into database. Check if your patient username is correct."
     return redirect(url_for("upload_report_message", message=message))
+
 
 if __name__ == "__main__":
     app.run('127.0.0.1', 5000, debug = True)
