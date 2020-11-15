@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Reports</title>
+</head>
+<body>
+	<h1>View Reports</h1>
+	<p>This page will dynamically display options with respect to your role</p>
+	<p>User: {{session["username"]}}</p>
+	<p>Role: {{session["role"]}}</p>
+	<br><br>
+
+	<table>
+	{% if session["role"] == 'caretaker' %}
+		<tr>
+			<th>Patient</th>
+			<th>Report Name</th>
+		</tr>
+		{% for e in results %}
+		<tr>
+			<td>{{e['patient_user']}}</td>
+			<td>
+				<a href="/viewReport/{{session['username']}}/{{e['patient_user']}}/{{e['report_name']}}">
+					{{e['report_name']}}
+				</a>
+			</td>
+		</tr>
+		{% endfor %}
+	{% elif session["role"] == 'patient' %}
+		<tr>
+			<th>Caretaker</th>
+			<th>Report Name</th>
+		</tr>
+		{% for e in results %}
+		<tr>
+			<td>{{e['caretaker_user']}}</td>
+			<td>
+				<a href="/viewReport/{{e['caretaker_user']}}/{{session['username']}}/{{e['report_name']}}">
+					{{e['report_name']}}
+				</a>
+			</td>
+		</tr>
+		{% endfor %}
+	{% endif %}
+	</table>
+
+
+	<br><br>
+	<a href='/medicalReportMenu'>Back to Report Menu</a><br>
+	<a href="/home">Home</a>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!doctype html>
+<title>Upload new File</title>
+<h1>Upload new File</h1>
+{% if message %}
+	<p>{{message}}</p>
+{% endif %}
+<form action="/uploadReportHandler" method=post enctype=multipart/form-data>
+  <input type="text" name = "patient" placeholder="patient" required/> </br>
+  <input type=file name=file>
+  <input type=submit value=Upload>
+</form>
+
+<br><br>
+<a href='/medicalReportMenu'>Back to Report Menu</a><br>
+<a href='/home'>Home</a>
