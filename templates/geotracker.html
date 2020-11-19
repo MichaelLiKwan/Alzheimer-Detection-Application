@@ -52,12 +52,12 @@
           zoom: 6,
         });
         infoWindow = new google.maps.InfoWindow();
-        const locationButton = document.createElement("button");
-        locationButton.textContent = "Pan to Current Location";
-        locationButton.classList.add("custom-map-control-button");
-        map.controls[google.maps.ControlPosition.TOP_CENTER].push(
-          locationButton
-        );
+        //const locationButton = document.createElement("button");
+        //locationButton.textContent = "Pan to Current Location";
+        //locationButton.classList.add("custom-map-control-button");
+        //map.controls[google.maps.ControlPosition.TOP_CENTER].push(
+        //  locationButton
+        //);
         locationButton.addEventListener("click", () => {
           // Try HTML5 geolocation.
           if (navigator.geolocation) {
@@ -73,6 +73,7 @@
                 map.setCenter(pos);
                 document.getElementById("lat").value = pos["lat"];
                 document.getElementById("lng").value = pos["lng"];
+                document.getElementById("myForm").submit();
               },
               () => {
                 handleLocationError(true, infoWindow, map.getCenter());
@@ -98,9 +99,10 @@
   </head>
   <body>
     <div id="map"></div>
-    <form action="/home" method="POST">
+    <form id = "myForm" action="/home" method="POST">
       <input type="text" id = "lat" value = "n/a" /> </br>
       <input type="text" id = "lng" value = "n/a" /> </br>
+      <input type="submit" value="Submit" />
     </form>
   </body>
 </html>
