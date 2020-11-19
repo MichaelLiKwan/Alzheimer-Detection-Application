@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template, request, session, url_for, redirect, session, send_from_directory
 import pymysql.cursors
+import requests, json
 from functools import wraps
 
 #Initialize the app from flask
@@ -13,8 +14,8 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf'}
 conn = pymysql.connect(host='localhost',
                        port=3306,
                        user='root',
-                       
-                       password='root',
+
+                       password='',
                        db='alzheimersDetectionProject',
 
                        charset='utf8mb4',
