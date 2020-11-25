@@ -52,28 +52,43 @@
           zoom: 6,
         });
         infoWindow = new google.maps.InfoWindow();
-        //const locationButton = document.createElement("button");
-        //locationButton.textContent = "Pan to Current Location";
-        //locationButton.classList.add("custom-map-control-button");
-        //map.controls[google.maps.ControlPosition.TOP_CENTER].push(
-        //  locationButton
-        //);
+        const locationButton = document.createElement("button");
+        locationButton.textContent = "Pan to Current Location";
+        locationButton.classList.add("custom-map-control-button");
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(
+          locationButton
+        );
         locationButton.addEventListener("click", () => {
           // Try HTML5 geolocation.
+          var res = ""
           if (navigator.geolocation) {
             navigator.geolocation.watchPosition(
               (position) => {
                 const pos = {
                   lat: position.coords.latitude,
                   lng: position.coords.longitude,
+                  time: position.timestamp,
                 };
                 infoWindow.setPosition(pos);
                 infoWindow.setContent("Location found.");
                 infoWindow.open(map);
                 map.setCenter(pos);
-                document.getElementById("lat").value = pos["lat"];
-                document.getElementById("lng").value = pos["lng"];
-                document.getElementById("myForm").submit();
+
+                const dateObj = new Date(pos["time"])
+                utcString = dateObj.toUTCString();
+
+                str1 = utcString
+                str2 = " ("
+                str3 = pos["lat"].toString();
+                str4 = ", "
+                str5 = pos["lng"].toString();
+                str6 = ")\n"
+
+                var coord = str1.concat(str2, str3, str4, str5, str6);
+                res = res.concat(coord)
+                document.getElementById("coords").value = res;
+                //document.getElementById("lng").value = pos["lng"];
+                //document.getElementById("myForm").submit();
               },
               () => {
                 handleLocationError(true, infoWindow, map.getCenter());
@@ -99,10 +114,10 @@
   </head>
   <body>
     <div id="map"></div>
-    <form id = "myForm" action="/home" method="POST">
-      <input type="text" id = "lat" value = "n/a" /> </br>
-      <input type="text" id = "lng" value = "n/a" /> </br>
-      <input type="submit" value="Submit" />
+    <form id = "myForm" action="/geotrackerRecord" method="POST">
+      <input type="hidden" id = "coords" name = 'coords' value = "n/a" /> </br>
+<!--      <input type="hidden" id = "lng" name = 'lng' value = "n/a" /> </br>-->
+      <input type="submit" value="Go Back" />
     </form>
   </body>
 </html>

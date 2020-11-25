@@ -122,6 +122,28 @@ def registerAuth():
         return redirect(url_for("hello"))
 
 # redirect from home.html
+@app.route('/geotracker')
+@login_required
+def geotracker():
+    return render_template('geotracker.html')
+
+@app.route('/geotrackerRecord', methods = ['GET','POST'])
+@login_required
+def geotrackerRecord():
+    coordinates = request.form['coords']
+    patient_username = request.form['patient']
+    caretaker_username = session['username']
+    upload_folder = "data/reports/%s/%s" % (caretaker_username, patient_username)
+    f = open("")
+    cursor = conn.cursor()
+    ins = 'INSERT INTO coordinates VALUES(%s, %s)'
+    cursor.execute(ins, (latitude, longitude))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for("home"))
+
+
+# redirect from home.html
 @app.route('/medicalReportMenu')
 @login_required
 def medicalReportMenu():

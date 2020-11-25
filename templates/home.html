@@ -11,6 +11,10 @@
     <br>
     <h2>Hello, {{session['firstName']}}</h2>
     <a href="/medicalReportMenu">Medical Report</a>
+
+    {% if session["role"] == 'patient' %}
+        <a href="/geotracker">Get Location</a>
+
     <br><br>
     <img src="{{ url_for('static', filename='alzheimerFact.jpg') }}" style="width:100%;max-width:1000px" >
     </body>
