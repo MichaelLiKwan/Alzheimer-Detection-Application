@@ -13,7 +13,13 @@
     <a href="/medicalReportMenu">Medical Report</a>
 
     {% if session["role"] == 'patient' %}
-        <a href="/geotracker">Get Location</a>
+        <a href="/geotracker">Track Me</a>
+
+    {% elif session["role"] == 'caretaker' %}
+        <form action="/getLocation" method="POST">
+            <input type="text" name = "patient_username" placeholder="Patient Username" required/> </br>
+            <input type="submit" value="Get Location" />
+        </form>
     {% endif %}
     <br><br>
     <img src="{{ url_for('static', filename='alzheimerFact.jpg') }}" style="width:100%;max-width:1000px" >

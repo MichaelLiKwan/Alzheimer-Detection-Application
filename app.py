@@ -144,11 +144,31 @@ def geotrackerRecord():
     except OSError as error:
         pass
     coordinates = request.form['coords']
+    ls = coordinates.split("\n")
     f = open(upload_folder+"/"+"tracker.txt", "a")
-    f.write(coordinates)
+    for elem in ls:
+        f.write(elem)
     f.close()
     return redirect(url_for("home"))
 
+@app.route('/getLocation', methods = ['GET','POST'])
+@login_required
+def getLocation():
+    caretaker_username = session['username']
+    patient_username = request.form['patient_username']
+    upload_folder = "data/reports/%s/%s" % (caretaker_username, patient_username)
+    try:
+        os.makedirs(upload_folder)
+    except OSError as error:
+        pass
+    f = open(upload_folder + "/" + "tracker.txt", "r")
+    lastCoord = f.readlines()[-1]
+    f.close()
+    lastLat = float(lastCoord.strip().split(" ")[6][1:][:-1])
+    lastLng = float(lastCoord.strip().split(" ")[7][:-1])
+    session['lastLat'] = lastLat
+    session['lastLng'] = lastLng
+    return render_template('viewLocation.html')
 
 # redirect from home.html
 @app.route('/medicalReportMenu')
