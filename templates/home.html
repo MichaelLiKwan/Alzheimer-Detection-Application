@@ -14,7 +14,7 @@
 
     {% if session["role"] == 'patient' %}
         <a href="/geotracker">Get Location</a>
-
+    {% endif %}
     <br><br>
     <img src="{{ url_for('static', filename='alzheimerFact.jpg') }}" style="width:100%;max-width:1000px" >
     </body>

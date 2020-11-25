@@ -130,16 +130,23 @@ def geotracker():
 @app.route('/geotrackerRecord', methods = ['GET','POST'])
 @login_required
 def geotrackerRecord():
-    coordinates = request.form['coords']
-    patient_username = request.form['patient']
-    caretaker_username = session['username']
-    upload_folder = "data/reports/%s/%s" % (caretaker_username, patient_username)
-    f = open("")
+    patient_username = session['username']
     cursor = conn.cursor()
-    ins = 'INSERT INTO coordinates VALUES(%s, %s)'
-    cursor.execute(ins, (latitude, longitude))
-    conn.commit()
+    query = 'SELECT caretaker_user FROM reports WHERE patient_user=%s'
+    cursor.execute(query, (patient_username))
+    result = cursor.fetchone()
     cursor.close()
+    caretaker_username = result['caretaker_user']
+
+    upload_folder = "data/reports/%s/%s" % (caretaker_username, patient_username)
+    try:
+        os.makedirs(upload_folder)
+    except OSError as error:
+        pass
+    coordinates = request.form['coords']
+    f = open(upload_folder+"/"+"tracker.txt", "a")
+    f.write(coordinates)
+    f.close()
     return redirect(url_for("home"))
 
 
