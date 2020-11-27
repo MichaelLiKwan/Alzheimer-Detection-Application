@@ -15,7 +15,7 @@ conn = pymysql.connect(host='localhost',
                        port=3306,
                        user='root',
 
-                       password='',
+                       password='root',
                        db='alzheimersDetectionProject',
 
                        charset='utf8mb4',
@@ -223,13 +223,8 @@ def upload_report_handler():
     patient_username = request.form['patient']
     caretaker_username = session['username']
     upload_folder = "data/reports/%s/%s" % (caretaker_username, patient_username)
-    try:
-        os.makedirs(upload_folder) 
-    except OSError as error:
-        pass
     app.config['UPLOAD_FOLDER'] = upload_folder
     message = "Error: An unknown error has occured"
-
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -242,14 +237,11 @@ def upload_report_handler():
         # if file upload is well formed
         if file and allowed_file(file.filename):
             filename = file.filename
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            message = "Report successfully uploaded"
-
             # Check against db if filename exists
             # If not add, else no change.
             cursor = conn.cursor()
             query = 'SELECT * FROM reports WHERE caretaker_user=%s AND patient_user=%s AND report_name=%s'
-            cursor.execute(query, (session['username'], patient_username, filename))
+            cursor.execute(query, (caretaker_username, patient_username, filename))
             data = cursor.fetchone()
             cursor.close()
             error = None
@@ -259,9 +251,16 @@ def upload_report_handler():
                 try:
                     cursor = conn.cursor()
                     ins = 'INSERT INTO reports VALUES(%s, %s, %s)'
-                    cursor.execute(ins, (session['username'], patient_username, filename))
+                    cursor.execute(ins, (caretaker_username, patient_username, filename))
                     conn.commit()
                     cursor.close()
+                    
+                    try:
+                        os.makedirs(upload_folder) 
+                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    except OSError as error:
+                        pass
+                    message = "Report successfully uploaded"
                 except:
                     message = "An error occured when inserting into database. Check if your patient username is correct."
     return redirect(url_for("upload_report_message", message=message))
