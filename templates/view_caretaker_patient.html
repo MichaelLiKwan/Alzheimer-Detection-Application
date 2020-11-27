@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>CaretakerPatient</title>
+</head>
+<body>
+	{% if session["role"] == 'caretaker' %}
+		<h1>View Patients</h1>
+	{% elif session["role"] == 'patient' %}
+		<h1>View Care Providers</h1>
+	{% endif %}
+	<table>
+	{% if session["role"] == 'caretaker' %}
+		<tr>
+			<th>Patients</th>
+		</tr>
+		{% for e in results %}
+		<tr>
+			<td><a href="/viewProfile/{{e['patient_user']}}">{{e['patient_user']}}</a></td>
+		</tr>
+		{% endfor %}
+	{% elif session["role"] == 'patient' %}
+		<tr>
+			<th>Care Providers</th>
+		</tr>
+		{% for e in results %}
+		<tr>
+			<td><a href="/viewProfile/{{e['caretaker_user']}}">{{e['caretaker_user']}}</a></td>
+		</tr>
+		{% endfor %}
+	{% endif %}
+	</table>
+	<br><br>
+	<a href="/home">Home</a>
+</body>
+</html>

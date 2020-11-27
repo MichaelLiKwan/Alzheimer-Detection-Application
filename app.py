@@ -15,7 +15,7 @@ conn = pymysql.connect(host='localhost',
                        port=3306,
                        user='root',
 
-                       password='',
+                       password='root',
                        db='alzheimersDetectionProject',
 
                        charset='utf8mb4',
@@ -43,6 +43,11 @@ def hello():
 @login_required
 def home():
     return render_template('home.html')
+
+@app.route("/logout")
+def logout():
+    session.pop("username")
+    return redirect("/")
 
 @app.route("/login")
 def login():
@@ -119,6 +124,15 @@ def registerAuth():
         cursor.execute(ins, (username, password, firstName, lastName, phoneNumber, email, role))
         conn.commit()
         cursor.close()
+        # Second insert into caretaker or patients table
+        cursor = conn.cursor()
+        if role == "caretaker":
+            ins = 'INSERT INTO caretakers VALUES(%s)'
+        elif role == "patient":
+            ins = 'INSERT INTO patients VALUES(%s)'
+        cursor.execute(ins, (username))
+        conn.commit()
+        cursor.close()
         return redirect(url_for("hello"))
 
 # redirect from home.html
@@ -171,6 +185,71 @@ def getLocation():
     return render_template('viewLocation.html')
 
 # redirect from home.html
+@app.route('/enrollPatient')
+@login_required
+def enrollPatient():
+    return render_template('enroll_patient.html')
+
+@app.route('/enrollPatient/<message>')
+@login_required
+def enrollPatientMessage(message):
+    return render_template('enroll_patient.html', message=message)
+
+@app.route('/enrollPatientHandler', methods=['GET', 'POST'])
+@login_required
+def enrollPatienthandler():
+    patient_username = request.form['patient']
+    caretaker_username = session['username']
+    message = "Error: An unknown error has occured"
+
+    error = None
+    cursor = conn.cursor()
+    query = 'SELECT * FROM caretaker_patient WHERE caretaker_user=%s AND patient_user=%s'
+    cursor.execute(query, (caretaker_username, patient_username))
+    data = cursor.fetchone()
+    cursor.close()
+    if data:
+        message = "This patient is already enrolled in a treatment with you!"
+    else:
+        try:
+            cursor = conn.cursor()
+            ins = 'INSERT INTO caretaker_patient VALUES(%s, %s)'
+            cursor.execute(ins, (caretaker_username, patient_username))
+            conn.commit()
+            cursor.close()
+            message = "Patient successfully enrolled!"
+        except:
+            message = "An error occured when inserting into database. Check if your patient username is correct."
+    return redirect(url_for("enrollPatientMessage", message=message))
+
+@app.route('/viewCaretakerPatient')
+@login_required
+def viewCaretakerPatient():
+    username = session["username"]
+    if session['role'] == 'caretaker':
+        cursor = conn.cursor()
+        query = 'SELECT patient_user FROM caretaker_patient WHERE caretaker_user=%s'
+        cursor.execute(query, (username))
+        results = cursor.fetchall()
+        cursor.close()
+    else:
+        cursor = conn.cursor()
+        query = 'SELECT caretaker_user FROM caretaker_patient WHERE patient_user=%s'
+        cursor.execute(query, (username))
+        results = cursor.fetchall()
+        cursor.close()
+    return render_template('view_caretaker_patient.html', results=results)
+
+@app.route('/viewProfile/<user>')
+@login_required
+def viewProfile(user):
+    cursor = conn.cursor()
+    query = 'SELECT * FROM users WHERE username=%s'
+    cursor.execute(query, (user))
+    results = cursor.fetchone()
+    cursor.close()
+    return render_template('view_profile.html', results=results)
+
 @app.route('/medicalReportMenu')
 @login_required
 def medicalReportMenu():
@@ -192,7 +271,6 @@ def view_report():
         cursor.execute(query, (username))
         results = cursor.fetchall()
         cursor.close()
-        print(results)
     return render_template('view_report.html', results=results)
 
 @app.route('/viewReport/<caretaker>/<patient>/<report>')
@@ -223,13 +301,8 @@ def upload_report_handler():
     patient_username = request.form['patient']
     caretaker_username = session['username']
     upload_folder = "data/reports/%s/%s" % (caretaker_username, patient_username)
-    try:
-        os.makedirs(upload_folder) 
-    except OSError as error:
-        pass
     app.config['UPLOAD_FOLDER'] = upload_folder
     message = "Error: An unknown error has occured"
-
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -242,14 +315,11 @@ def upload_report_handler():
         # if file upload is well formed
         if file and allowed_file(file.filename):
             filename = file.filename
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            message = "Report successfully uploaded"
-
             # Check against db if filename exists
             # If not add, else no change.
             cursor = conn.cursor()
             query = 'SELECT * FROM reports WHERE caretaker_user=%s AND patient_user=%s AND report_name=%s'
-            cursor.execute(query, (session['username'], patient_username, filename))
+            cursor.execute(query, (caretaker_username, patient_username, filename))
             data = cursor.fetchone()
             cursor.close()
             error = None
@@ -259,9 +329,15 @@ def upload_report_handler():
                 try:
                     cursor = conn.cursor()
                     ins = 'INSERT INTO reports VALUES(%s, %s, %s)'
-                    cursor.execute(ins, (session['username'], patient_username, filename))
+                    cursor.execute(ins, (caretaker_username, patient_username, filename))
                     conn.commit()
                     cursor.close()
+                    try:
+                        os.makedirs(upload_folder) 
+                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    except OSError as error:
+                        pass
+                    message = "Report successfully uploaded"
                 except:
                     message = "An error occured when inserting into database. Check if your patient username is correct."
     return redirect(url_for("upload_report_message", message=message))
