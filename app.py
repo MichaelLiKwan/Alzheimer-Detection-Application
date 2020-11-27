@@ -44,6 +44,11 @@ def hello():
 def home():
     return render_template('home.html')
 
+@app.route("/logout")
+def logout():
+    session.pop("username")
+    return redirect("/")
+
 @app.route("/login")
 def login():
     return render_template("login.html")
@@ -119,6 +124,15 @@ def registerAuth():
         cursor.execute(ins, (username, password, firstName, lastName, phoneNumber, email, role))
         conn.commit()
         cursor.close()
+        # Second insert into caretaker or patients table
+        cursor = conn.cursor()
+        if role == "caretaker":
+            ins = 'INSERT INTO caretakers VALUES(%s)'
+        elif role == "patient":
+            ins = 'INSERT INTO patients VALUES(%s)'
+        cursor.execute(ins, (username))
+        conn.commit()
+        cursor.close()
         return redirect(url_for("hello"))
 
 # redirect from home.html
@@ -171,6 +185,43 @@ def getLocation():
     return render_template('viewLocation.html')
 
 # redirect from home.html
+@app.route('/enrollPatient')
+@login_required
+def enrollPatient():
+    return render_template('enroll_patient.html')
+
+@app.route('/enrollPatient/<message>')
+@login_required
+def enrollPatientMessage(message):
+    return render_template('enroll_patient.html', message=message)
+
+@app.route('/enrollPatientHandler', methods=['GET', 'POST'])
+@login_required
+def enrollPatienthandler():
+    patient_username = request.form['patient']
+    caretaker_username = session['username']
+    message = "Error: An unknown error has occured"
+
+    error = None
+    cursor = conn.cursor()
+    query = 'SELECT * FROM caretaker_patient WHERE caretaker_user=%s AND patient_user=%s'
+    cursor.execute(query, (caretaker_username, patient_username))
+    data = cursor.fetchone()
+    cursor.close()
+    if data:
+        message = "This patient is already enrolled in a treatment with you!"
+    else:
+        try:
+            cursor = conn.cursor()
+            ins = 'INSERT INTO caretaker_patient VALUES(%s, %s)'
+            cursor.execute(ins, (caretaker_username, patient_username))
+            conn.commit()
+            cursor.close()
+            message = "Patient successfully enrolled!"
+        except:
+            message = "An error occured when inserting into database. Check if your patient username is correct."
+    return redirect(url_for("enrollPatientMessage", message=message))
+
 @app.route('/medicalReportMenu')
 @login_required
 def medicalReportMenu():
@@ -254,7 +305,6 @@ def upload_report_handler():
                     cursor.execute(ins, (caretaker_username, patient_username, filename))
                     conn.commit()
                     cursor.close()
-                    
                     try:
                         os.makedirs(upload_folder) 
                         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))

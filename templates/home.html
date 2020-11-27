@@ -10,8 +10,11 @@
     <h1>Home</h1>
     <br>
     <h2>Hello, {{session['firstName']}}</h2>
+    {% if session["role"] == 'caretaker' %}
+        <a href="/enrollPatient">Enroll Patient</a><br>
+    {% endif %}
     <a href="/medicalReportMenu">Medical Report</a>
-
+    <br>
     {% if session["role"] == 'patient' %}
         <a href="/geotracker">Track Me</a>
 
@@ -21,6 +24,8 @@
             <input type="submit" value="Get Location" />
         </form>
     {% endif %}
+    <br>
+    <a href="/logout">Logout</a>
     <br><br>
     <img src="{{ url_for('static', filename='alzheimerFact.jpg') }}" style="width:100%;max-width:1000px" >
     </body>
