@@ -13,8 +13,10 @@
     {% if session["role"] == 'caretaker' %}
         <a href="/enrollPatient">Enroll Patient</a><br>
         <a href="/viewCaretakerPatient">View Your Patients</a><br>
+        <a href="/viewEmergencyAlert">View Emergency Alerts</a><br>
     {% elif session["role"] == 'patient' %}
         <a href="/viewCaretakerPatient">View Your Care Providers</a><br>
+        <a href="/sendEmergencyAlert">Send Emergency Alert</a><br>
     {% endif %}
     <a href="/medicalReportMenu">Medical Report</a>
     <br>

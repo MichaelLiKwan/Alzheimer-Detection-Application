@@ -15,7 +15,7 @@ conn = pymysql.connect(host='localhost',
                        port=3306,
                        user='root',
 
-                       password='root',
+                       password='',
                        db='alzheimersDetectionProject',
 
                        charset='utf8mb4',
@@ -239,6 +239,49 @@ def viewCaretakerPatient():
         results = cursor.fetchall()
         cursor.close()
     return render_template('view_caretaker_patient.html', results=results)
+
+@app.route('/viewEmergencyAlert')
+@login_required
+def viewEmergencyAlert():
+    username = session["username"]
+    cursor = conn.cursor()
+    query = 'SELECT patient_user FROM caretaker_patient WHERE caretaker_user =%s AND alert=1'
+    cursor.execute(query, (username))
+    results = conn.fetchall()
+    cursor.close()
+    return render_template('view_emergency_alert.html', results=results)
+
+@app.route('/sendEmergencyAlert')
+@login_required
+def sendEmergencyAlert():
+    return render_template('send_emergency_alert.html')
+
+@app.route('/sendAlertHandler', methods = ['GET','POST'])
+@login_required
+def sendAlertHandler():
+    patient_username = session['username']
+    caretaker_username = ???
+    alert = 1
+    message = "Error: An unknown error has occurred"
+
+    error = None
+    cursor = conn.cursor()
+    query = 'SELECT * FROM caretaker_patient WHERE caretaker_user=%s AND patient_user=%s AND alert =0'
+    data = cursor.fetchone()
+    cursor.close()
+    if data:
+        message = "You have already sent an alert"
+    else:
+        try:
+            cursor = conn.cursor()
+            ins = 'INSERT INTO caretaker_patient VALUES(%s, %s, 1)'
+            cursor.execute(ins, (caretaker_username, patient_username, alert))
+            conn.commit()
+            cursor.close()
+            message = "Alert successfully sent"
+        except:
+            message = "An error occurred when inserting into database"
+    return redirect(url_for("sendAlertMessage", message=message))
 
 @app.route('/viewProfile/<user>')
 @login_required

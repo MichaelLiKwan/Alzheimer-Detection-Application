@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>ViewEmergencyAlert</title>
+</head>
+<body>
+    <table>
+        <th>Emergency Alert From</th>
+        {% for e in results %}
+        <tr>
+            <td><a href="/viewProfile/{{e['patient_user]}}">{{e['patient_user]}}</a></td>
+        </tr>
+    </table>
+    <br><br>
+    <a href="/home">Home</a>
+</body>
+</html>
