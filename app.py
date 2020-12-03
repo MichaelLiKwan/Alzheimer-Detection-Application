@@ -253,20 +253,21 @@ def viewEmergencyAlert():
 
 @app.route('/sendEmergencyAlert')
 @login_required
-def sendEmergencyAlert():
-    return render_template('send_emergency_alert.html')
+def sendEmergencyAlert(message):
+    return render_template('send_emergency_alert.html', message=message)
 
 @app.route('/sendAlertHandler', methods = ['GET','POST'])
 @login_required
 def sendAlertHandler():
     patient_username = session['username']
-    caretaker_username = ???
+    caretaker_username = request.form['caretaker']
     alert = 1
     message = "Error: An unknown error has occurred"
 
     error = None
     cursor = conn.cursor()
-    query = 'SELECT * FROM caretaker_patient WHERE caretaker_user=%s AND patient_user=%s AND alert =0'
+    query = 'SELECT * FROM caretaker_patient WHERE caretaker_user=%s AND patient_user=%s AND alert = 1'
+    cursor.execute(query, (caretaker_username, patient_username))
     data = cursor.fetchone()
     cursor.close()
     if data:
