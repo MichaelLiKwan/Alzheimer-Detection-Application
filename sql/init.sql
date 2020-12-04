@@ -79,6 +79,16 @@ CREATE TABLE `reports` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `trackers`
+--
+
+CREATE TABLE `trackers` (
+  `patient_user` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 

@@ -157,12 +157,38 @@ def geotrackerRecord():
     for elem in ls:
         f.write(elem)
     f.close()
-    return redirect(url_for("home"))
 
-@app.route('/getLocation', methods = ['GET','POST'])
+    cursor = conn.cursor()
+    query = 'SELECT * FROM trackers WHERE patient_user=%s'
+    cursor.execute(query, (patient_username))
+    data = cursor.fetchone()
+    cursor.close()
+
+    if data:
+        return redirect(url_for("home"))
+    else:
+        cursor = conn.cursor()
+        ins = 'INSERT INTO trackers VALUES(%s)'
+        cursor.execute(ins, (patient_username))
+        conn.commit()
+        cursor.close()
+        return redirect(url_for("home"))
+
+
+@app.route('/findPatientToLocate')
+@login_required
+def findPatientToLocate():
+    cursor = conn.cursor()
+    query = 'SELECT patient_user FROM trackers'
+    cursor.execute(query)
+    patients = cursor.fetchall()
+    cursor.close()
+    return render_template('findPatientToLocate.html', patients = patients)
+
+@app.route('/viewLocation', methods = ['GET','POST'])
 @login_required
 def getLocation():
-    patient_username = request.form['patient_username']
+    patient_username = request.form['patient']
     upload_folder = "data/tracker/%s" % (patient_username)
     try:
         os.makedirs(upload_folder)
