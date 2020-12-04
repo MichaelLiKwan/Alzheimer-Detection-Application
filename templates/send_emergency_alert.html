@@ -7,14 +7,14 @@
     <title>SendEmergencyAlert</title>
 </head>
 <body>
-    <h1>Send Emergency Alert</h1>
+    <h1>Emergency Alert Sent!</h1>
     {% if message %}
         <p>{{message}}</p>
     {% endif %}
-    <form action="/sendAlertHandler" method="post">
-        <input type = "text" name = "caretaker" placeholder = "caretaker" required/> </br>
-        <input type = submit value = Upload>
-    </form>
+<!--    <form action="/sendAlertHandler" method="post">-->
+<!--        <input type = "text" name = "caretaker" placeholder = "caretaker" required/> </br>-->
+<!--        <input type = submit value = Upload>-->
+<!--    </form>-->
     <a href='/home'>Home</a>
 </body>
 </html>

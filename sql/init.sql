@@ -79,6 +79,17 @@ CREATE TABLE `reports` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `alerts`
+--
+
+CREATE TABLE `alerts` (
+  `caretaker_user` varchar(255) NOT NULL,
+  `patient_user` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `trackers`
 --
 

@@ -264,44 +264,63 @@ def viewCaretakerPatient():
 def viewEmergencyAlert():
     username = session["username"]
     cursor = conn.cursor()
-    query = 'SELECT patient_user FROM caretaker_patient WHERE caretaker_user =%s AND alert=1'
+    query = 'SELECT patient_user FROM alerts WHERE caretaker_user =%s'
     cursor.execute(query, (username))
-    results = conn.fetchall()
+    results = cursor.fetchall()
     cursor.close()
     return render_template('view_emergency_alert.html', results=results)
 
 @app.route('/sendEmergencyAlert')
 @login_required
-def sendEmergencyAlert(message):
-    return render_template('send_emergency_alert.html', message=message)
-
-@app.route('/sendAlertHandler', methods = ['GET','POST'])
-@login_required
-def sendAlertHandler():
+def sendEmergencyAlert():
     patient_username = session['username']
-    caretaker_username = request.form['caretaker']
-    alert = 1
-    message = "Error: An unknown error has occurred"
-
-    error = None
     cursor = conn.cursor()
-    query = 'SELECT * FROM caretaker_patient WHERE caretaker_user=%s AND patient_user=%s AND alert = 1'
-    cursor.execute(query, (caretaker_username, patient_username))
-    data = cursor.fetchone()
+    query = 'SELECT caretaker_user FROM caretaker_patient WHERE patient_user=%s'
+    cursor.execute(query, (patient_username))
+    data = cursor.fetchall()
     cursor.close()
+    message = None
+
     if data:
-        message = "You have already sent an alert"
-    else:
-        try:
+        for line in data:
+            caretaker_username = line['caretaker_user']
             cursor = conn.cursor()
-            ins = 'INSERT INTO caretaker_patient VALUES(%s, %s, 1)'
-            cursor.execute(ins, (caretaker_username, patient_username, alert))
+            ins = 'INSERT INTO alerts (caretaker_user, patient_user) VALUES (%s, %s)'
+            cursor.execute(ins, (caretaker_username, patient_username))
             conn.commit()
             cursor.close()
-            message = "Alert successfully sent"
-        except:
-            message = "An error occurred when inserting into database"
-    return redirect(url_for("sendAlertMessage", message=message))
+    else:
+        message = "no caretakers are assigned to you"
+
+    return render_template('send_emergency_alert.html', message=message)
+
+# @app.route('/sendAlertHandler', methods = ['GET','POST'])
+# @login_required
+# def sendAlertHandler():
+#     patient_username = session['username']
+#     caretaker_username = request.form['caretaker']
+#     alert = 1
+#     message = "Error: An unknown error has occurred"
+#
+#     error = None
+#     cursor = conn.cursor()
+#     query = 'SELECT * FROM alerts WHERE caretaker_user=%s AND patient_user=%s'
+#     cursor.execute(query, (caretaker_username, patient_username))
+#     data = cursor.fetchone()
+#     cursor.close()
+#     if data:
+#         message = "You have already sent an alert"
+#     else:
+#         try:
+#             cursor = conn.cursor()
+#             ins = 'INSERT INTO alerts VALUES(%s, %s)'
+#             cursor.execute(ins, (caretaker_username, patient_username))
+#             conn.commit()
+#             cursor.close()
+#             message = "Alert successfully sent"
+#         except:
+#             message = "An error occurred when inserting into database"
+#     return redirect(url_for("sendEmergencyAlert", message=message))
 
 @app.route('/viewProfile/<user>')
 @login_required
