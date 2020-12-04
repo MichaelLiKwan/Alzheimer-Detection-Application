@@ -11,9 +11,19 @@
             <input type="radio" id = "patient" name = "patient" value={{line.patient_user}}>
             <label for="patient">{{line.patient_user}}</label><br>
         {% endfor %}
-
-        <input type="submit" value="Get Location" />
+        {% if patients %}
+            <input type="submit" value="Get Location" />
+        {% endif %}
     </form>
     <a href="/home">Home</a>
 </body>
+<script>
+    var bt = document.getElementById('btSubmit');
+    if (txt.value != '') {
+        bt.disabled = false;
+    }
+    else {
+        bt.disabled = true;
+    }
+</script>
 </html>
