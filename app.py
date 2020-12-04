@@ -145,14 +145,8 @@ def geotracker():
 @login_required
 def geotrackerRecord():
     patient_username = session['username']
-    cursor = conn.cursor()
-    query = 'SELECT caretaker_user FROM reports WHERE patient_user=%s'
-    cursor.execute(query, (patient_username))
-    result = cursor.fetchone()
-    cursor.close()
-    caretaker_username = result['caretaker_user']
 
-    upload_folder = "data/reports/%s/%s" % (caretaker_username, patient_username)
+    upload_folder = "data/tracker/%s" % (patient_username)
     try:
         os.makedirs(upload_folder)
     except OSError as error:
@@ -168,9 +162,8 @@ def geotrackerRecord():
 @app.route('/getLocation', methods = ['GET','POST'])
 @login_required
 def getLocation():
-    caretaker_username = session['username']
     patient_username = request.form['patient_username']
-    upload_folder = "data/reports/%s/%s" % (caretaker_username, patient_username)
+    upload_folder = "data/tracker/%s" % (patient_username)
     try:
         os.makedirs(upload_folder)
     except OSError as error:
