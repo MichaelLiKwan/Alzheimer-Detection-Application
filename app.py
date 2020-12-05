@@ -294,6 +294,17 @@ def sendEmergencyAlert():
 
     return render_template('send_emergency_alert.html', message=message)
 
+@app.route('/clearAlerts')
+@login_required
+def clearAlerts():
+    username = session["username"]
+    cursor = conn.cursor()
+    query = 'DELETE FROM alerts WHERE caretaker_user =%s;'
+    cursor.execute(query, (username))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for("home"))
+
 # @app.route('/sendAlertHandler', methods = ['GET','POST'])
 # @login_required
 # def sendAlertHandler():
